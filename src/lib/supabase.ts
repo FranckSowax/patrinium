@@ -10,6 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 // Debug temporaire — a retirer apres verification
 console.log('[Supabase] URL:', supabaseUrl);
-console.log('[Supabase] Key (10 premiers chars):', supabaseAnonKey?.substring(0, 10) + '...');
+console.log('[Supabase] Key length:', supabaseAnonKey?.length, '(attendu: 225)');
+console.log('[Supabase] Key last 10:', '...' + supabaseAnonKey?.slice(-10));
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
