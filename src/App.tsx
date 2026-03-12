@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Dashboard } from '@/components/Dashboard';
 import { CadastreModule } from '@/components/CadastreModule';
@@ -13,41 +13,23 @@ import { ConcessionsModule } from '@/components/ConcessionsModule';
 import { CessionsModule } from '@/components/CessionsModule';
 
 function App() {
-  const [activeModule, setActiveModule] = useState('dashboard');
-
-  const renderModule = () => {
-    switch (activeModule) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'cadastre':
-        return <CadastreModule />;
-      case 'affectations':
-        return <AffectationsModule />;
-      case 'maintenance':
-        return <MaintenanceModule />;
-      case 'loyers':
-        return <LoyersModule />;
-      case 'inventaire':
-        return <InventaireModule />;
-      case 'vehicules':
-        return <VehiculesModule />;
-      case 'concessions':
-        return <ConcessionsModule />;
-      case 'cessions':
-        return <CessionsModule />;
-      case 'charges':
-        return <ChargesModule />;
-      case 'ia':
-        return <AIAssistantModule />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
   return (
-    <Layout activeModule={activeModule} onModuleChange={setActiveModule}>
-      {renderModule()}
-    </Layout>
+    <Routes>
+      <Route path="/dashboard" element={<Layout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="biens-immobiliers" element={<CadastreModule />} />
+        <Route path="biens-mobiliers" element={<InventaireModule />} />
+        <Route path="vehicules" element={<VehiculesModule />} />
+        <Route path="concessions" element={<ConcessionsModule />} />
+        <Route path="affectations" element={<AffectationsModule />} />
+        <Route path="maintenance" element={<MaintenanceModule />} />
+        <Route path="loyers" element={<LoyersModule />} />
+        <Route path="cessions" element={<CessionsModule />} />
+        <Route path="charges" element={<ChargesModule />} />
+        <Route path="assistant-ia" element={<AIAssistantModule />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 }
 

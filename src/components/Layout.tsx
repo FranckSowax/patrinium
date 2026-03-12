@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Map,
@@ -31,59 +32,68 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-interface LayoutProps {
-  children: React.ReactNode;
-  activeModule: string;
-  onModuleChange: (module: string) => void;
+interface NavItem {
+  path: string;
+  label: string;
+  icon: any;
 }
 
 interface NavSection {
   title: string;
-  items: { id: string; label: string; icon: any }[];
+  items: NavItem[];
 }
 
 const navSections: NavSection[] = [
   {
     title: 'General',
     items: [
-      { id: 'dashboard', label: 'Tableau de Bord', icon: LayoutDashboard },
+      { path: '/dashboard', label: 'Tableau de Bord', icon: LayoutDashboard },
     ],
   },
   {
     title: 'Inventaire du Patrimoine',
     items: [
-      { id: 'cadastre', label: 'Biens Immobiliers', icon: Map },
-      { id: 'inventaire', label: 'Biens Mobiliers', icon: Package },
-      { id: 'vehicules', label: 'Parc Automobile', icon: Car },
-      { id: 'concessions', label: 'Concessions & Domaines', icon: Landmark },
+      { path: '/dashboard/biens-immobiliers', label: 'Biens Immobiliers', icon: Map },
+      { path: '/dashboard/biens-mobiliers', label: 'Biens Mobiliers', icon: Package },
+      { path: '/dashboard/vehicules', label: 'Parc Automobile', icon: Car },
+      { path: '/dashboard/concessions', label: 'Concessions & Domaines', icon: Landmark },
     ],
   },
   {
     title: 'Operations',
     items: [
-      { id: 'affectations', label: 'Affectations', icon: ClipboardList },
-      { id: 'maintenance', label: 'GMAO Maintenance', icon: Wrench },
-      { id: 'loyers', label: 'Valorisation & Loyers', icon: DollarSign },
-      { id: 'cessions', label: 'Cessions', icon: ArrowRightLeft },
-      { id: 'charges', label: 'Charges Admin.', icon: Receipt },
+      { path: '/dashboard/affectations', label: 'Affectations', icon: ClipboardList },
+      { path: '/dashboard/maintenance', label: 'GMAO Maintenance', icon: Wrench },
+      { path: '/dashboard/loyers', label: 'Valorisation & Loyers', icon: DollarSign },
+      { path: '/dashboard/cessions', label: 'Cessions', icon: ArrowRightLeft },
+      { path: '/dashboard/charges', label: 'Charges Admin.', icon: Receipt },
     ],
   },
   {
     title: 'Outils',
     items: [
-      { id: 'ia', label: 'Assistant IA & BI', icon: Bot },
+      { path: '/dashboard/assistant-ia', label: 'Assistant IA & BI', icon: Bot },
     ],
   },
 ];
 
-export function Layout({ children, activeModule, onModuleChange }: LayoutProps) {
+export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notifications] = useState(5);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return location.pathname === '/dashboard';
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Sidebar */}
-      <aside 
+      <aside
         className={`fixed inset-y-0 left-0 z-50 bg-slate-900 text-white transition-all duration-300 ${
           sidebarOpen ? 'w-72' : 'w-20'
         }`}
@@ -102,7 +112,7 @@ export function Layout({ children, activeModule, onModuleChange }: LayoutProps) 
             )}
           </div>
           {sidebarOpen && (
-            <button 
+            <button
               onClick={() => setSidebarOpen(false)}
               className="text-slate-400 hover:text-white transition-colors"
             >
@@ -129,23 +139,23 @@ export function Layout({ children, activeModule, onModuleChange }: LayoutProps) 
                   {section.title}
                 </p>
               )}
-              {section.items.map((module) => {
-                const Icon = module.icon;
-                const isActive = activeModule === module.id;
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
 
                 return (
                   <button
-                    key={module.id}
-                    onClick={() => onModuleChange(module.id)}
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
-                      isActive
+                      active
                         ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-900/30'
                         : 'text-slate-400 hover:text-white hover:bg-slate-800'
                     } ${!sidebarOpen && 'justify-center px-2'}`}
                   >
-                    <Icon className={`w-5 h-5 flex-shrink-0 ${isActive && 'animate-pulse'}`} />
+                    <Icon className={`w-5 h-5 flex-shrink-0 ${active && 'animate-pulse'}`} />
                     {sidebarOpen && (
-                      <span className="text-sm font-medium whitespace-nowrap">{module.label}</span>
+                      <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>
                     )}
                   </button>
                 );
@@ -162,8 +172,8 @@ export function Layout({ children, activeModule, onModuleChange }: LayoutProps) 
                 <Building2 className="w-4 h-4 text-slate-400" />
               </div>
               <div className="overflow-hidden">
-                <p className="text-xs text-slate-400">Direction Générale</p>
-                <p className="text-xs font-medium">du Patrimoine de l'État</p>
+                <p className="text-xs text-slate-400">Direction Generale</p>
+                <p className="text-xs font-medium">du Patrimoine de l'Etat</p>
               </div>
             </div>
           </div>
@@ -176,20 +186,20 @@ export function Layout({ children, activeModule, onModuleChange }: LayoutProps) 
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-40">
           <div className="flex items-center gap-4 flex-1">
             {!sidebarOpen && (
-              <button 
+              <button
                 onClick={() => setSidebarOpen(true)}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
             )}
-            
+
             {/* Search */}
             <div className="relative max-w-md flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input 
+              <input
                 type="text"
-                placeholder="Rechercher un bien, une référence..."
+                placeholder="Rechercher un bien, une reference..."
                 className="w-full pl-10 pr-4 py-2 bg-slate-100 border-0 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
               />
             </div>
@@ -217,7 +227,7 @@ export function Layout({ children, activeModule, onModuleChange }: LayoutProps) 
                   </Avatar>
                   <div className="hidden md:block text-left">
                     <p className="text-sm font-medium text-slate-900">Dr. Koumba</p>
-                    <p className="text-xs text-slate-500">Directeur Général</p>
+                    <p className="text-xs text-slate-500">Directeur General</p>
                   </div>
                   <ChevronDown className="w-4 h-4 text-slate-400" />
                 </button>
@@ -231,12 +241,12 @@ export function Layout({ children, activeModule, onModuleChange }: LayoutProps) 
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Building2 className="w-4 h-4 mr-2" />
-                  Paramètres
+                  Parametres
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600">
                   <LogOut className="w-4 h-4 mr-2" />
-                  Déconnexion
+                  Deconnexion
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -245,7 +255,7 @@ export function Layout({ children, activeModule, onModuleChange }: LayoutProps) 
 
         {/* Page Content */}
         <div className="p-6">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>
