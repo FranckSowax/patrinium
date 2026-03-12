@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Building2,
@@ -20,6 +20,36 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
+/* ── Scroll-reveal hook (Intersection Observer) ── */
+function useScrollReveal(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+
+  return { ref, visible };
+}
+
+/* ── Hover glow colors per service ── */
+const HOVER_SHADOWS: Record<string, string> = {
+  "bg-emerald-100 text-emerald-700": "hover:shadow-emerald-200/60",
+  "bg-blue-100 text-blue-700": "hover:shadow-blue-200/60",
+  "bg-orange-100 text-orange-700": "hover:shadow-orange-200/60",
+  "bg-purple-100 text-purple-700": "hover:shadow-purple-200/60",
+  "bg-red-100 text-red-700": "hover:shadow-red-200/60",
+  "bg-gray-100 text-gray-700": "hover:shadow-slate-200/60",
+  "bg-slate-100 text-slate-700": "hover:shadow-slate-200/60",
+};
 
 const NAV_LINKS = [
   { label: "Accueil", href: "#" },
@@ -121,6 +151,167 @@ const STATS = [
   { value: "24/7", label: "Accessible" },
 ];
 
+/* ── Animation A+C : Services cards with fade-in cascade & hover lift/glow ── */
+function ServicesSection() {
+  const { ref, visible } = useScrollReveal(0.1);
+
+  return (
+    <section id="services" className="bg-slate-50 py-16 sm:py-24">
+      <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2
+            className={`text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl transition-all duration-700 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            Nos Services
+          </h2>
+          <p
+            className={`mt-3 text-base text-slate-600 transition-all duration-700 delay-100 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            Effectuez vos demarches en ligne
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {SERVICES.map((service, idx) => {
+            const Icon = service.icon;
+            const hoverShadow = HOVER_SHADOWS[service.color] ?? "hover:shadow-slate-200/60";
+            return (
+              <Card
+                key={service.title}
+                className={`group relative overflow-hidden transition-all duration-500 ease-out
+                  hover:-translate-y-2 hover:shadow-xl ${hoverShadow}
+                  ${visible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-8"
+                  }`}
+                style={{ transitionDelay: visible ? `${150 + idx * 100}ms` : "0ms" }}
+              >
+                <CardContent className="p-6">
+                  <div
+                    className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${service.color}`}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    {service.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    {service.description}
+                  </p>
+                  <Link
+                    to={service.href}
+                    className="mt-4 inline-flex items-center text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-900"
+                  >
+                    Faire une demande
+                    <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Animation D : Steps with progressive line & pulse circles ── */
+function StepsSection() {
+  const { ref, visible } = useScrollReveal(0.2);
+
+  return (
+    <section id="comment-ca-marche" className="bg-white py-16 sm:py-24">
+      <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2
+            className={`text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl transition-all duration-700 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            Comment ca marche
+          </h2>
+          <p
+            className={`mt-3 text-base text-slate-600 transition-all duration-700 delay-100 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            Quatre etapes simples pour votre demarche
+          </p>
+        </div>
+
+        <div className="relative mt-16">
+          {/* Animated connector line (desktop) */}
+          <div className="absolute left-0 right-0 top-8 hidden h-0.5 lg:block">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 transition-all duration-[1800ms] ease-out origin-left"
+              style={{
+                transform: visible ? "scaleX(1)" : "scaleX(0)",
+                transformOrigin: "left",
+              }}
+            />
+          </div>
+
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map((step, idx) => {
+              const Icon = step.icon;
+              const delay = 300 + idx * 400;
+              return (
+                <div
+                  key={step.title}
+                  className={`relative text-center transition-all duration-600 ease-out ${
+                    visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                  }`}
+                  style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
+                >
+                  {/* Step circle with pulse */}
+                  <div className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+                    {/* Pulse ring */}
+                    <div
+                      className={`absolute inset-0 rounded-full bg-emerald-200 ${
+                        visible ? "animate-ping" : ""
+                      }`}
+                      style={{
+                        animationDelay: `${delay}ms`,
+                        animationDuration: "1s",
+                        animationIterationCount: "1",
+                      }}
+                    />
+                    <div
+                      className={`absolute inset-0 rounded-full transition-all duration-500 ${
+                        visible ? "bg-emerald-100 scale-100" : "bg-emerald-50 scale-75"
+                      }`}
+                      style={{ transitionDelay: `${delay}ms` }}
+                    />
+                    <Icon className="relative h-7 w-7 text-emerald-700" />
+                    <span
+                      className={`absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white transition-all duration-300 ${
+                        visible ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                      }`}
+                      style={{ transitionDelay: `${delay + 200}ms` }}
+                    >
+                      {idx + 1}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-semibold text-slate-900">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    {step.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -162,10 +353,9 @@ export function HomePage() {
           <Link to="/" className="flex items-center gap-2">
             <img src="/logo-dgpe.png" alt="DGPE" className="h-[72px] w-[72px] rounded-full object-cover" />
             <div className="leading-tight">
-              <span className="text-lg font-bold tracking-tight text-slate-900">
-                PATRINIUM
-              </span>
-              <span className="block text-[11px] text-slate-500">
+              <span className="text-sm font-bold tracking-tight text-slate-900 leading-snug">
+                Direction Generale du
+                <br />
                 Patrimoine de l'Etat
               </span>
             </div>
@@ -320,95 +510,12 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ============ SERVICES SECTION ============ */}
-      <section id="services" className="bg-slate-50 py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              Nos Services
-            </h2>
-            <p className="mt-3 text-base text-slate-600">
-              Effectuez vos demarches en ligne
-            </p>
-          </div>
+      {/* ============ SERVICES SECTION (A: fade-in cascade + C: hover lift & glow) ============ */}
+      <ServicesSection />
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {SERVICES.map((service) => {
-              const Icon = service.icon;
-              return (
-                <Card
-                  key={service.title}
-                  className="group relative overflow-hidden transition-shadow hover:shadow-lg"
-                >
-                  <CardContent className="p-6">
-                    <div
-                      className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${service.color}`}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      {service.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                      {service.description}
-                    </p>
-                    <Link
-                      to={service.href}
-                      className="mt-4 inline-flex items-center text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-900"
-                    >
-                      Faire une demande
-                      <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                    </Link>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
-      {/* ============ COMMENT CA MARCHE ============ */}
-      <section id="comment-ca-marche" className="bg-white py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-              Comment ca marche
-            </h2>
-            <p className="mt-3 text-base text-slate-600">
-              Quatre etapes simples pour votre demarche
-            </p>
-          </div>
-
-          <div className="relative mt-16">
-            {/* Connector line (desktop) */}
-            <div className="absolute left-0 right-0 top-8 hidden h-0.5 border-t-2 border-dashed border-emerald-200 lg:block" />
-
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-              {STEPS.map((step, idx) => {
-                const Icon = step.icon;
-                return (
-                  <div key={step.title} className="relative text-center">
-                    {/* Step number badge */}
-                    <div className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
-                      <div className="absolute inset-0 rounded-full bg-emerald-100" />
-                      <Icon className="relative h-7 w-7 text-emerald-700" />
-                      <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white">
-                        {idx + 1}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-semibold text-slate-900">
-                      {step.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                      {step.description}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ============ COMMENT CA MARCHE (D: progressive line + pulse) ============ */}
+      <StepsSection />
 
       {/* ============ FOOTER ============ */}
       <footer id="contact" className="bg-slate-900 text-slate-300">
@@ -419,10 +526,9 @@ export function HomePage() {
               <div className="flex items-center gap-2">
                 <img src="/logo-dgpe.png" alt="DGPE" className="h-[72px] w-[72px] rounded-full object-cover" />
                 <div className="leading-tight">
-                  <span className="text-lg font-bold text-white">
-                    PATRINIUM
-                  </span>
-                  <span className="block text-[11px] text-slate-400">
+                  <span className="text-sm font-bold text-white leading-snug">
+                    Direction Generale du
+                    <br />
                     Patrimoine de l'Etat
                   </span>
                 </div>
