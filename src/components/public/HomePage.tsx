@@ -17,6 +17,9 @@ import {
   ChevronRight,
   Menu,
   X,
+  Calendar,
+  ExternalLink,
+  Facebook,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,6 +57,7 @@ const HOVER_SHADOWS: Record<string, string> = {
 const NAV_LINKS = [
   { label: "Accueil", href: "#" },
   { label: "Services", href: "#services" },
+  { label: "Actualites", href: "#actualites" },
   { label: "Suivi Dossier", href: "/suivi" },
   { label: "Contact", href: "#contact" },
 ];
@@ -149,6 +153,41 @@ const STATS = [
   { value: "8 000+", label: "Demandes traitees" },
   { value: "9", label: "Provinces couvertes" },
   { value: "24/7", label: "Accessible" },
+];
+
+const ACTUALITES = [
+  {
+    date: "10 Mars 2026",
+    title: "Inventaire general du patrimoine immobilier de l'Etat : Phase 2 lancee",
+    summary:
+      "La DGPE a lance la deuxieme phase de l'inventaire general des biens immobiliers de l'Etat couvrant les provinces du Haut-Ogooue, de la Ngounie et de l'Ogooue-Maritime.",
+    tag: "Inventaire",
+    tagColor: "bg-blue-100 text-blue-700",
+  },
+  {
+    date: "04 Mars 2026",
+    title: "Reunion de coordination avec les Directions Provinciales",
+    summary:
+      "Le Directeur General a preside une reunion de coordination avec l'ensemble des Directeurs Provinciaux pour le suivi des operations de recensement des biens mobiliers.",
+    tag: "Institutionnel",
+    tagColor: "bg-emerald-100 text-emerald-700",
+  },
+  {
+    date: "25 Fevrier 2026",
+    title: "Formation des agents a la plateforme numerique DGPE",
+    summary:
+      "Une session de formation a ete organisee au profit de 45 agents sur l'utilisation de la nouvelle plateforme de gestion du patrimoine de l'Etat.",
+    tag: "Formation",
+    tagColor: "bg-purple-100 text-purple-700",
+  },
+  {
+    date: "18 Fevrier 2026",
+    title: "Prise en charge des frais d'inhumation : nouveau guichet en ligne",
+    summary:
+      "Les familles des agents de l'Etat peuvent desormais soumettre leurs demandes de prise en charge des frais d'inhumation directement en ligne via le portail DGPE.",
+    tag: "Services",
+    tagColor: "bg-orange-100 text-orange-700",
+  },
 ];
 
 /* ── Animation A+C : Services cards with fade-in cascade & hover lift/glow ── */
@@ -306,6 +345,83 @@ function StepsSection() {
               );
             })}
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Actualites section with fade-in ── */
+function ActualitesSection() {
+  const { ref, visible } = useScrollReveal(0.1);
+
+  return (
+    <section id="actualites" className="bg-slate-50 py-16 sm:py-24">
+      <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2
+            className={`text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl transition-all duration-700 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            Actualites
+          </h2>
+          <p
+            className={`mt-3 text-base text-slate-600 transition-all duration-700 delay-100 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            Les dernieres nouvelles de la DGPE
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-2">
+          {ACTUALITES.map((actu, idx) => (
+            <Card
+              key={actu.title}
+              className={`group overflow-hidden transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-lg ${
+                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+              style={{ transitionDelay: visible ? `${200 + idx * 120}ms` : "0ms" }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${actu.tagColor}`}>
+                    {actu.tag}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-slate-400">
+                    <Calendar className="h-3 w-3" />
+                    {actu.date}
+                  </span>
+                </div>
+                <h3 className="text-base font-semibold text-slate-900 leading-snug group-hover:text-emerald-700 transition-colors">
+                  {actu.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  {actu.summary}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Link to Facebook */}
+        <div
+          className={`mt-10 text-center transition-all duration-700 ${
+            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: visible ? "800ms" : "0ms" }}
+        >
+          <a
+            href="https://www.facebook.com/dgpe241"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-[#1877F2] px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-[#166FE5] hover:shadow-lg hover:-translate-y-0.5"
+          >
+            <Facebook className="h-5 w-5" />
+            Suivez-nous sur Facebook
+            <ExternalLink className="h-3.5 w-3.5 opacity-70" />
+          </a>
         </div>
       </div>
     </section>
@@ -516,6 +632,9 @@ export function HomePage() {
 
       {/* ============ COMMENT CA MARCHE (D: progressive line + pulse) ============ */}
       <StepsSection />
+
+      {/* ============ ACTUALITES ============ */}
+      <ActualitesSection />
 
       {/* ============ FOOTER ============ */}
       <footer id="contact" className="bg-slate-900 text-slate-300">
