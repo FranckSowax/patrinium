@@ -212,6 +212,73 @@ export async function updateCessionStatut(id: string, statut: 'finalisee' | 'ann
 
 // ─── Marchés ────────────────────────────────────────────────────────────
 
+// ─── Demandes Guichet Unique ────────────────────────────────────────
+
+export async function createDemandeGuichet(data: {
+  type: string;
+  objet: string;
+  description?: string;
+  priorite?: string;
+  demandeur_type?: string;
+  demandeur_nom: string;
+  demandeur_organisme?: string;
+  demandeur_poste?: string;
+  demandeur_email?: string;
+  demandeur_telephone?: string;
+  ministere_id?: string;
+  province_id?: string;
+  bien_immobilier_id?: string;
+  bien_mobilier_id?: string;
+  sla_jours?: number;
+}) {
+  return db.from('demandes_guichet').insert(data).select().single();
+}
+
+export async function updateDemandeStatut(id: string, statut: string, extras?: Record<string, unknown>) {
+  const update: Record<string, unknown> = { statut, ...extras };
+  if (statut === 'en_instruction') update.date_instruction = new Date().toISOString();
+  if (statut === 'validee' || statut === 'rejetee') update.date_decision = new Date().toISOString();
+  return db.from('demandes_guichet').update(update).eq('id', id).select().single();
+}
+
+// ─── Messages Dossier ──────────────────────────────────────────────
+
+export async function createMessageDossier(data: {
+  demande_id: string;
+  auteur_nom: string;
+  auteur_role?: string;
+  contenu: string;
+}) {
+  return db.from('messages_dossier').insert({
+    ...data,
+    auteur_role: data.auteur_role || 'agent',
+  }).select().single();
+}
+
+// ─── Rendez-vous & Inspections ──────────────────────────────────────
+
+export async function createRdvInspection(data: {
+  type: string;
+  objet: string;
+  demande_id?: string;
+  bien_immobilier_id?: string;
+  date_rdv: string;
+  duree_minutes?: number;
+  lieu: string;
+  agent_nom: string;
+  agent_telephone?: string;
+  visiteur_nom?: string;
+  visiteur_telephone?: string;
+  visiteur_organisme?: string;
+  notes?: string;
+}) {
+  return db.from('rdv_inspections').insert(data).select().single();
+}
+
+export async function updateRdvStatut(id: string, statut: string, extras?: Record<string, unknown>) {
+  return db.from('rdv_inspections').update({ statut, ...extras }).eq('id', id).select().single();
+}
+
 export async function updateMarcheAvancement(id: string, taux: number) {
   const update: Record<string, unknown> = { taux_avancement: taux };
   if (taux >= 100) {

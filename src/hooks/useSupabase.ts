@@ -388,6 +388,64 @@ export function usePatrimoineGlobalStats() {
   return { stats, loading, refetch: fetch };
 }
 
+// ─── Module : Guichet Unique ────────────────────────────────────────
+
+export function useDemandesGuichet(filters?: { type?: string; statut?: string; priorite?: string; search?: string }) {
+  return useSupabaseQuery(() => {
+    let q = supabase
+      .from('demandes_guichet')
+      .select('*, ministeres(nom), provinces(nom)')
+      .order('date_depot', { ascending: false });
+
+    if (filters?.type) q = q.eq('type', filters.type);
+    if (filters?.statut) q = q.eq('statut', filters.statut);
+    if (filters?.priorite) q = q.eq('priorite', filters.priorite);
+    if (filters?.search) q = q.or(`reference.ilike.%${filters.search}%,objet.ilike.%${filters.search}%,demandeur_nom.ilike.%${filters.search}%`);
+    return q;
+  }, [filters?.type, filters?.statut, filters?.priorite, filters?.search]);
+}
+
+export function useMessagesDossier(demandeId?: string) {
+  return useSupabaseQuery(() => {
+    let q = supabase
+      .from('messages_dossier')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (demandeId) q = q.eq('demande_id', demandeId);
+    return q;
+  }, [demandeId]);
+}
+
+export function useRdvInspections(filters?: { type?: string; statut?: string }) {
+  return useSupabaseQuery(() => {
+    let q = supabase
+      .from('rdv_inspections')
+      .select('*, demandes_guichet(reference, objet)')
+      .order('date_rdv', { ascending: true });
+
+    if (filters?.type) q = q.eq('type', filters.type);
+    if (filters?.statut) q = q.eq('statut', filters.statut);
+    return q;
+  }, [filters?.type, filters?.statut]);
+}
+
+export function useGuichetStats() {
+  const [stats, setStats] = useState<Record<string, number> | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase.rpc('get_guichet_stats') as { data: any; error: any };
+    if (!error && data) setStats(data as Record<string, number>);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+
+  return { stats, loading, refetch: fetch };
+}
+
 export function useInterventionsMensuelles() {
   const [data, setData] = useState<{ mois: string; nouvelles: number; terminees: number }[]>([]);
   const [loading, setLoading] = useState(true);

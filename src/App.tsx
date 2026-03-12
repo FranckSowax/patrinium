@@ -11,6 +11,9 @@ import { AIAssistantModule } from '@/components/AIAssistantModule';
 import { VehiculesModule } from '@/components/VehiculesModule';
 import { ConcessionsModule } from '@/components/ConcessionsModule';
 import { CessionsModule } from '@/components/CessionsModule';
+import { GuichetUniqueModule } from '@/components/GuichetUniqueModule';
+import { RendezVousModule } from '@/components/RendezVousModule';
+import { MessagerieModule } from '@/components/MessagerieModule';
 
 function App() {
   return (
@@ -26,6 +29,9 @@ function App() {
         <Route path="loyers" element={<LoyersModule />} />
         <Route path="cessions" element={<CessionsModule />} />
         <Route path="charges" element={<ChargesModule />} />
+        <Route path="guichet" element={<GuichetUniqueModule />} />
+        <Route path="rendez-vous" element={<RendezVousModule />} />
+        <Route path="messagerie" element={<MessagerieModule />} />
         <Route path="assistant-ia" element={<AIAssistantModule />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

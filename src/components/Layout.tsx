@@ -19,7 +19,10 @@ import {
   Building2,
   Car,
   Landmark,
-  ArrowRightLeft
+  ArrowRightLeft,
+  FileText,
+  Calendar,
+  MessageSquare
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -67,6 +70,14 @@ const navSections: NavSection[] = [
       { path: '/dashboard/loyers', label: 'Valorisation & Loyers', icon: DollarSign },
       { path: '/dashboard/cessions', label: 'Cessions', icon: ArrowRightLeft },
       { path: '/dashboard/charges', label: 'Charges Admin.', icon: Receipt },
+    ],
+  },
+  {
+    title: 'Guichet & Interactions',
+    items: [
+      { path: '/dashboard/guichet', label: 'Guichet Unique', icon: FileText },
+      { path: '/dashboard/rendez-vous', label: 'RDV & Inspections', icon: Calendar },
+      { path: '/dashboard/messagerie', label: 'Messagerie Dossiers', icon: MessageSquare },
     ],
   },
   {
