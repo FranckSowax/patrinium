@@ -14,10 +14,19 @@ import { CessionsModule } from '@/components/CessionsModule';
 import { GuichetUniqueModule } from '@/components/GuichetUniqueModule';
 import { RendezVousModule } from '@/components/RendezVousModule';
 import { MessagerieModule } from '@/components/MessagerieModule';
+import { HomePage } from '@/components/public/HomePage';
+import { ServiceFormPage } from '@/components/public/ServiceFormPage';
+import { SuiviDossierPage } from '@/components/public/SuiviDossierPage';
 
 function App() {
   return (
     <Routes>
+      {/* Portail Public */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/services/:type" element={<ServiceFormPage />} />
+      <Route path="/suivi" element={<SuiviDossierPage />} />
+
+      {/* Back-office DGPE */}
       <Route path="/dashboard" element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="biens-immobiliers" element={<CadastreModule />} />
@@ -34,7 +43,8 @@ function App() {
         <Route path="messagerie" element={<MessagerieModule />} />
         <Route path="assistant-ia" element={<AIAssistantModule />} />
       </Route>
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
