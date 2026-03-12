@@ -59,6 +59,19 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
+// Grille officielle DGPE des frais d'inhumation
+const GRILLE_INHUMATION = [
+  { categorie: 'Categorie A',                  montant: 1000000 },
+  { categorie: 'Categorie B',                  montant: 800000  },
+  { categorie: 'Categorie C',                  montant: 700000  },
+  { categorie: "Main d'oeuvre non permanente",  montant: 575000  },
+  { categorie: 'Conjoint(e)',                   montant: 650000  },
+  { categorie: 'Enfants a charge',             montant: 500000  },
+  { categorie: 'Retraites',                    montant: 575000  },
+  { categorie: 'Eleves et etudiants',          montant: 500000  },
+  { categorie: 'Indigents',                    montant: 400000  },
+];
+
 const getTypeIcon = (type: string) => {
   switch (type) {
     case 'eau': return <Droplets className="w-4 h-4 text-blue-500" />;
@@ -246,6 +259,7 @@ export function ChargesModule() {
           <TabsTrigger value="electricite">Électricité</TabsTrigger>
           <TabsTrigger value="telecom">Télécom</TabsTrigger>
           <TabsTrigger value="sociales">Charges Sociales</TabsTrigger>
+          <TabsTrigger value="inhumation">Frais Inhumation</TabsTrigger>
         </TabsList>
 
         <TabsContent value="toutes">
@@ -365,6 +379,111 @@ export function ChargesModule() {
             </Card>
           </TabsContent>
         ))}
+        {/* Onglet Inhumation */}
+        <TabsContent value="inhumation">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Grille officielle */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Flower2 className="w-5 h-5 text-slate-600" />
+                  Grille Officielle DGPE
+                </CardTitle>
+                <p className="text-sm text-slate-500 mt-1">
+                  Montants fixes par la Direction Generale du Patrimoine de l'Etat pour la prise en charge des frais d'inhumation.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-slate-50">
+                        <TableHead className="font-semibold">Categorie</TableHead>
+                        <TableHead className="font-semibold text-right">Montant FCFA</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {GRILLE_INHUMATION.map((g) => (
+                        <TableRow key={g.categorie}>
+                          <TableCell>{g.categorie}</TableCell>
+                          <TableCell className="text-right font-semibold">
+                            {formatCurrency(g.montant)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <p className="text-xs text-slate-400 mt-3 italic">
+                  Source : Direction Generale du Patrimoine de l'Etat — Ministere des Comptes Publics
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Dossiers funerailles */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Dossiers de Prise en Charge</CardTitle>
+                <p className="text-sm text-slate-500 mt-1">
+                  Charges de type funerailles enregistrees dans le systeme.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Beneficiaire</TableHead>
+                      <TableHead>Montant</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(charges || [])
+                      .filter(c => c.type === 'funerailles')
+                      .map((charge) => (
+                        <TableRow key={charge.id}>
+                          <TableCell>{charge.beneficiaire}</TableCell>
+                          <TableCell className="font-medium">{formatCurrency(charge.montant)}</TableCell>
+                          <TableCell>{charge.date_facture}</TableCell>
+                          <TableCell>
+                            <Badge className={charge.statut === 'paye' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
+                              {charge.statut === 'paye' ? 'Paye' : 'En attente'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="icon">
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              {charge.statut === 'en_attente' && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-emerald-600"
+                                  onClick={() => { setSelectedCharge(charge); setPaiementDialogOpen(true); }}
+                                >
+                                  <Check className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    {(charges || []).filter(c => c.type === 'funerailles').length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-slate-400">
+                          Aucun dossier d'inhumation enregistre
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
       </Tabs>
 
       {/* Paiement Dialog */}

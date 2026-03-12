@@ -7,6 +7,7 @@ import {
   FileText,
   ArrowRightLeft,
   MessageSquare,
+  Flower2,
   Hash,
   Clock,
   CheckCircle,
@@ -67,6 +68,14 @@ const SERVICES = [
       "Demandez la cession ou la vente aux encheres de biens reformes de l'Etat.",
     color: "bg-red-100 text-red-700",
     href: "/services/cession",
+  },
+  {
+    icon: Flower2,
+    title: "Frais d'Inhumation",
+    description:
+      "Demandez la prise en charge des frais d'inhumation selon la grille officielle de la DGPE.",
+    color: "bg-gray-100 text-gray-700",
+    href: "/services/inhumation",
   },
   {
     icon: MessageSquare,
@@ -151,9 +160,7 @@ export function HomePage() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-700">
-              <Building2 className="h-5 w-5 text-white" />
-            </div>
+            <img src="/logo-dgpe.png" alt="DGPE" className="h-9 w-9 rounded-full object-cover" />
             <div className="leading-tight">
               <span className="text-lg font-bold tracking-tight text-slate-900">
                 PATRINIUM
@@ -414,9 +421,7 @@ export function HomePage() {
             {/* Col 1 — Brand */}
             <div>
               <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-700">
-                  <Building2 className="h-5 w-5 text-white" />
-                </div>
+                <img src="/logo-dgpe.png" alt="DGPE" className="h-9 w-9 rounded-full object-cover" />
                 <div className="leading-tight">
                   <span className="text-lg font-bold text-white">
                     PATRINIUM

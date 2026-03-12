@@ -194,9 +194,7 @@ export function SuiviDossierPage() {
       <header className="border-b bg-white shadow-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <Link to="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-600">
-              <FileText className="h-5 w-5 text-white" />
-            </div>
+            <img src="/logo-dgpe.png" alt="DGPE" className="h-10 w-10 rounded-full object-cover" />
             <div>
               <h1 className="text-lg font-bold text-gray-900">PATRINIUM</h1>
               <p className="text-xs text-gray-500">DGPE Gabon</p>

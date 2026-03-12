@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   CheckCircle,
   Loader2,
-  Building2,
   Send,
   AlertCircle,
 } from 'lucide-react';
@@ -26,7 +25,7 @@ import { useProvinces } from '@/hooks/useSupabase';
 
 // ─── Service type configuration ─────────────────────────────────────────
 
-type ServiceKey = 'affectation' | 'concession' | 'maintenance' | 'bail' | 'cession' | 'reclamation' | 'renseignement';
+type ServiceKey = 'affectation' | 'concession' | 'maintenance' | 'bail' | 'cession' | 'reclamation' | 'renseignement' | 'inhumation';
 
 interface ServiceConfig {
   title: string;
@@ -93,7 +92,32 @@ const SERVICE_CONFIGS: Record<ServiceKey, ServiceConfig> = {
       "Posez votre question ou demandez des informations sur le patrimoine public. Reponse sous 10 jours ouvrables.",
     placeholder: 'Ex: Renseignement sur la disponibilite de locaux dans...',
   },
+  inhumation: {
+    title: 'Prise en Charge des Frais d\'Inhumation',
+    type_enum: 'prise_en_charge_inhumation',
+    sla: 15,
+    description:
+      "Demandez la prise en charge des frais d'inhumation par la DGPE. Le montant est determine selon la grille officielle en fonction de la categorie du defunt.",
+    placeholder: 'Ex: Prise en charge inhumation de M./Mme...',
+  },
 };
+
+// ─── Grille officielle des frais d'inhumation DGPE ──────────────────────
+
+const GRILLE_INHUMATION = [
+  { code: 'cat_a',    label: 'Categorie A',                     montant: 1000000 },
+  { code: 'cat_b',    label: 'Categorie B',                     montant: 800000  },
+  { code: 'cat_c',    label: 'Categorie C',                     montant: 700000  },
+  { code: 'monp',     label: "Main d'oeuvre non permanente",     montant: 575000  },
+  { code: 'conjoint', label: 'Conjoint(e)',                      montant: 650000  },
+  { code: 'enfant',   label: 'Enfants a charge',                montant: 500000  },
+  { code: 'retraite', label: 'Retraites',                       montant: 575000  },
+  { code: 'eleve',    label: 'Eleves et etudiants',             montant: 500000  },
+  { code: 'indigent', label: 'Indigents',                       montant: 400000  },
+];
+
+const formatXAF = (value: number) =>
+  new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(value);
 
 // ─── Component ──────────────────────────────────────────────────────────
 
@@ -115,6 +139,16 @@ export function ServiceFormPage() {
   const [email, setEmail] = useState('');
   const [telephone, setTelephone] = useState('');
   const [provinceId, setProvinceId] = useState('');
+
+  // ── Inhumation-specific state ──
+  const [categorieInhumation, setCategorieInhumation] = useState('');
+  const [defuntNom, setDefuntNom] = useState('');
+  const [defuntLienParente, setDefuntLienParente] = useState('');
+  const [defuntMatricule, setDefuntMatricule] = useState('');
+
+  const isInhumation = type === 'inhumation';
+  const selectedGrille = GRILLE_INHUMATION.find(g => g.code === categorieInhumation);
+  const montantInhumation = selectedGrille?.montant ?? 0;
 
   // ── UI state ──
   const [loading, setLoading] = useState(false);
@@ -148,11 +182,15 @@ export function ServiceFormPage() {
   // ── Validation ──
   function validate(): boolean {
     const errors: Record<string, boolean> = {};
-    if (!objet.trim()) errors.objet = true;
-    if (!description.trim()) errors.description = true;
+    if (!isInhumation && !objet.trim()) errors.objet = true;
+    if (!isInhumation && !description.trim()) errors.description = true;
     if (!nomComplet.trim()) errors.nomComplet = true;
     if (!email.trim()) errors.email = true;
     if (!telephone.trim()) errors.telephone = true;
+    if (isInhumation) {
+      if (!categorieInhumation) errors.categorieInhumation = true;
+      if (!defuntNom.trim()) errors.defuntNom = true;
+    }
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   }
@@ -170,10 +208,25 @@ export function ServiceFormPage() {
     setLoading(true);
 
     try {
+      // Build objet & description for inhumation
+      const finalObjet = isInhumation
+        ? `Prise en charge inhumation - ${selectedGrille?.label} - ${defuntNom.trim()}`
+        : objet.trim();
+      const finalDescription = isInhumation
+        ? [
+            `Categorie: ${selectedGrille?.label}`,
+            `Montant grille: ${formatXAF(montantInhumation)}`,
+            `Nom du defunt: ${defuntNom.trim()}`,
+            defuntLienParente ? `Lien de parente: ${defuntLienParente.trim()}` : '',
+            defuntMatricule ? `Matricule agent: ${defuntMatricule.trim()}` : '',
+            description.trim() ? `Observations: ${description.trim()}` : '',
+          ].filter(Boolean).join('\n')
+        : description.trim();
+
       const { data, error: mutError } = await createDemandeGuichet({
         type: config!.type_enum,
-        objet: objet.trim(),
-        description: description.trim(),
+        objet: finalObjet,
+        description: finalDescription,
         priorite,
         demandeur_type: demandeurType,
         demandeur_nom: nomComplet.trim(),
@@ -209,9 +262,7 @@ export function ServiceFormPage() {
         <header className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
+              <img src="/logo-dgpe.png" alt="DGPE" className="w-9 h-9 rounded-full object-cover" />
               <span className="text-lg font-bold text-gray-900">PATRINIUM</span>
             </Link>
           </div>
@@ -262,9 +313,7 @@ export function ServiceFormPage() {
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo-dgpe.png" alt="DGPE" className="w-9 h-9 rounded-full object-cover" />
             <span className="text-lg font-bold text-gray-900">PATRINIUM</span>
           </Link>
           <Link
@@ -294,7 +343,144 @@ export function ServiceFormPage() {
             </div>
           )}
 
-          {/* Section: Votre demande */}
+          {/* Section: Inhumation — Grille & Defunt */}
+          {isInhumation ? (
+            <>
+              {/* Grille officielle */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Grille Officielle des Montants</CardTitle>
+                  <CardDescription>
+                    Selectionnez la categorie du defunt. Le montant de prise en charge est fixe par la DGPE.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Tableau grille */}
+                  <div className="border rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-slate-100">
+                          <th className="text-left px-4 py-2.5 font-medium text-slate-700">Categorie</th>
+                          <th className="text-right px-4 py-2.5 font-medium text-slate-700">Montant FCFA</th>
+                          <th className="px-4 py-2.5 w-12"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {GRILLE_INHUMATION.map((g) => (
+                          <tr
+                            key={g.code}
+                            onClick={() => {
+                              setCategorieInhumation(g.code);
+                              if (validationErrors.categorieInhumation)
+                                setValidationErrors((v) => ({ ...v, categorieInhumation: false }));
+                            }}
+                            className={`cursor-pointer border-t transition-colors ${
+                              categorieInhumation === g.code
+                                ? 'bg-emerald-50 border-emerald-200'
+                                : 'hover:bg-slate-50'
+                            }`}
+                          >
+                            <td className="px-4 py-2.5">{g.label}</td>
+                            <td className="px-4 py-2.5 text-right font-semibold">
+                              {new Intl.NumberFormat('fr-FR').format(g.montant)} FCFA
+                            </td>
+                            <td className="px-4 py-2.5 text-center">
+                              <div className={`w-4 h-4 rounded-full border-2 mx-auto flex items-center justify-center ${
+                                categorieInhumation === g.code
+                                  ? 'border-emerald-600 bg-emerald-600'
+                                  : 'border-slate-300'
+                              }`}>
+                                {categorieInhumation === g.code && (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {validationErrors.categorieInhumation && (
+                    <p className="text-sm text-red-500">Veuillez selectionner une categorie.</p>
+                  )}
+
+                  {/* Montant selectionne */}
+                  {selectedGrille && (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-emerald-700 font-medium">Montant de prise en charge</p>
+                        <p className="text-xs text-emerald-600">{selectedGrille.label}</p>
+                      </div>
+                      <p className="text-2xl font-bold text-emerald-700">{formatXAF(montantInhumation)}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Info sur le defunt */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Informations sur le defunt</CardTitle>
+                  <CardDescription>Renseignez les informations relatives a la personne decedee.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="defunt-nom">
+                      Nom complet du defunt <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="defunt-nom"
+                      placeholder="Prenom et nom du defunt"
+                      value={defuntNom}
+                      onChange={(e) => {
+                        setDefuntNom(e.target.value);
+                        if (validationErrors.defuntNom)
+                          setValidationErrors((v) => ({ ...v, defuntNom: false }));
+                      }}
+                      className={validationErrors.defuntNom ? 'border-red-500' : ''}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="defunt-lien">Lien de parente avec le demandeur</Label>
+                      <Select value={defuntLienParente} onValueChange={setDefuntLienParente}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selectionnez..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="agent_lui_meme">L'agent lui-meme</SelectItem>
+                          <SelectItem value="conjoint">Conjoint(e)</SelectItem>
+                          <SelectItem value="enfant">Enfant</SelectItem>
+                          <SelectItem value="parent">Pere / Mere</SelectItem>
+                          <SelectItem value="autre_proche">Autre proche</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="defunt-matricule">Matricule de l'agent (si applicable)</Label>
+                      <Input
+                        id="defunt-matricule"
+                        placeholder="Ex: 123456-A"
+                        value={defuntMatricule}
+                        onChange={(e) => setDefuntMatricule(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description-inhumation">Observations complementaires</Label>
+                    <Textarea
+                      id="description-inhumation"
+                      placeholder="Informations supplementaires, pieces jointes a fournir, etc."
+                      rows={3}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+          /* Section: Votre demande (services classiques) */
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Votre demande</CardTitle>
@@ -354,6 +540,7 @@ export function ServiceFormPage() {
               </div>
             </CardContent>
           </Card>
+          )}
 
           {/* Section: Vos coordonnees */}
           <Card>

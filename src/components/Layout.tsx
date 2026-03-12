@@ -112,13 +112,11 @@ export function Layout() {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
           <div className={`flex items-center gap-3 ${!sidebarOpen && 'justify-center w-full'}`}>
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Building2 className="w-6 h-6 text-white" />
-            </div>
+            <img src="/logo-dgpe.png" alt="DGPE" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
             {sidebarOpen && (
               <div className="overflow-hidden">
                 <h1 className="font-bold text-lg leading-tight">PATRINIUM</h1>
-                <p className="text-xs text-slate-400">Gabon Patrimoine Digital</p>
+                <p className="text-xs text-slate-400">DGPE - Patrimoine de l'Etat</p>
               </div>
             )}
           </div>
@@ -179,9 +177,7 @@ export function Layout() {
         {sidebarOpen && (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-slate-400" />
-              </div>
+              <img src="/logo-dgpe.png" alt="DGPE" className="w-8 h-8 rounded-full object-cover" />
               <div className="overflow-hidden">
                 <p className="text-xs text-slate-400">Direction Generale</p>
                 <p className="text-xs font-medium">du Patrimoine de l'Etat</p>
