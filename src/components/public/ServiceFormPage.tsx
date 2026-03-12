@@ -262,7 +262,7 @@ export function ServiceFormPage() {
         <header className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
-              <img src="/logo-dgpe.png" alt="DGPE" className="w-9 h-9 rounded-full object-cover" />
+              <img src="/logo-dgpe.png" alt="DGPE" className="w-[72px] h-[72px] rounded-full object-cover" />
               <span className="text-lg font-bold text-gray-900">PATRINIUM</span>
             </Link>
           </div>
@@ -313,7 +313,7 @@ export function ServiceFormPage() {
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo-dgpe.png" alt="DGPE" className="w-9 h-9 rounded-full object-cover" />
+            <img src="/logo-dgpe.png" alt="DGPE" className="w-[72px] h-[72px] rounded-full object-cover" />
             <span className="text-lg font-bold text-gray-900">PATRINIUM</span>
           </Link>
           <Link

@@ -160,7 +160,7 @@ export function HomePage() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo-dgpe.png" alt="DGPE" className="h-9 w-9 rounded-full object-cover" />
+            <img src="/logo-dgpe.png" alt="DGPE" className="h-[72px] w-[72px] rounded-full object-cover" />
             <div className="leading-tight">
               <span className="text-lg font-bold tracking-tight text-slate-900">
                 PATRINIUM
@@ -257,19 +257,15 @@ export function HomePage() {
       </header>
 
       {/* ============ HERO SECTION ============ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-800">
-        {/* Decorative pattern overlay */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-white/5" />
-          <div className="absolute -bottom-20 -left-20 h-[350px] w-[350px] rounded-full bg-white/5" />
-          <div className="absolute right-1/4 top-1/3 h-[200px] w-[200px] rounded-full bg-teal-600/20" />
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-            }}
+      <section className="relative overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img
+            src="/hero-bg.jpeg"
+            alt=""
+            className="h-full w-full object-cover"
           />
+          <div className="absolute inset-0 bg-emerald-900/60" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
@@ -421,7 +417,7 @@ export function HomePage() {
             {/* Col 1 — Brand */}
             <div>
               <div className="flex items-center gap-2">
-                <img src="/logo-dgpe.png" alt="DGPE" className="h-9 w-9 rounded-full object-cover" />
+                <img src="/logo-dgpe.png" alt="DGPE" className="h-[72px] w-[72px] rounded-full object-cover" />
                 <div className="leading-tight">
                   <span className="text-lg font-bold text-white">
                     PATRINIUM

@@ -112,7 +112,7 @@ export function Layout() {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
           <div className={`flex items-center gap-3 ${!sidebarOpen && 'justify-center w-full'}`}>
-            <img src="/logo-dgpe.png" alt="DGPE" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+            <img src="/logo-dgpe.png" alt="DGPE" className="w-20 h-20 rounded-full object-cover flex-shrink-0" />
             {sidebarOpen && (
               <div className="overflow-hidden">
                 <h1 className="font-bold text-lg leading-tight">PATRINIUM</h1>
@@ -177,7 +177,7 @@ export function Layout() {
         {sidebarOpen && (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800">
             <div className="flex items-center gap-3">
-              <img src="/logo-dgpe.png" alt="DGPE" className="w-8 h-8 rounded-full object-cover" />
+              <img src="/logo-dgpe.png" alt="DGPE" className="w-16 h-16 rounded-full object-cover" />
               <div className="overflow-hidden">
                 <p className="text-xs text-slate-400">Direction Generale</p>
                 <p className="text-xs font-medium">du Patrimoine de l'Etat</p>
